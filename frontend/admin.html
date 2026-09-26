@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A.R.M.O.R — Admin</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="mark"><span class="mark-glyph"></span><span class="mark-text">A.R.M.O.R</span></div>
+      <div class="mark-sub">admin console</div>
+      <nav>
+        <a href="index.html">&larr; role select</a>
+        <a href="#overview" class="active">Overview</a>
+        <a href="#nodes">Storage nodes</a>
+        <a href="#buckets">Bucket policies</a>
+        <a href="#objects">Objects</a>
+        <a href="#repair">Repair</a>
+      </nav>
+      <div class="rail-foot">
+        Vault control plane<br />
+        <a href="user.html">Open user portal &rarr;</a>
+      </div>
+    </aside>
+
+    <main>
+      <h1>Cluster console</h1>
+      <p class="subtitle">Live view of the placement ring, Raft metadata cluster, and durability policies.</p>
+
+      <div id="connBanner" class="conn-banner"></div>
+
+      <section class="section" id="overview">
+        <div class="stat-row" id="statRow"></div>
+      </section>
+
+      <section class="section" id="nodes">
+        <div class="section-head">
+          <h2>Storage nodes</h2>
+          <span class="hint">consistent hash ring, virtual-node placement</span>
+        </div>
+        <table id="nodesTable">
+          <thead>
+            <tr><th>Node</th><th>Failure domain</th><th>Status</th><th>Chunks</th><th></th></tr>
+          </thead>
+          <tbody id="nodesBody"></tbody>
+        </table>
+
+        <div class="card" style="margin-top:16px;">
+          <div class="section-head" style="margin-bottom:14px;">
+            <h2>Add node</h2>
+          </div>
+          <form id="addNodeForm" class="form-grid">
+            <div>
+              <label for="nodeId">Node ID</label>
+              <input type="text" id="nodeId" placeholder="node-6" required />
+            </div>
+            <div>
+              <label for="failureDomain">Failure domain</label>
+              <input type="text" id="failureDomain" placeholder="rack-0" value="rack-0" />
+            </div>
+            <div>
+              <label for="weight">Weight</label>
+              <input type="number" id="weight" min="1" value="1" />
+            </div>
+            <div><button class="btn primary" type="submit">Add to ring</button></div>
+          </form>
+        </div>
+      </section>
+
+      <section class="section" id="raft">
+        <div class="section-head">
+          <h2>Raft metadata cluster</h2>
+          <span class="hint">leader election, log replication, fencing tokens</span>
+        </div>
+        <table id="raftTable">
+          <thead><tr><th>Node</th><th>Role</th><th>Term</th><th>Log length</th><th>Commit index</th></tr></thead>
+          <tbody id="raftBody"></tbody>
+        </table>
+      </section>
+
+      <section class="section" id="buckets">
+        <div class="section-head">
+          <h2>Bucket policies</h2>
+          <span class="hint">replication vs erasure-coded durability</span>
+        </div>
+        <table>
+          <thead><tr><th>Bucket</th><th>Mode</th><th>Config</th><th>Shards</th><th>Storage efficiency</th></tr></thead>
+          <tbody id="bucketsBody"></tbody>
+        </table>
+
+        <div class="card" style="margin-top:16px;">
+          <div class="section-head" style="margin-bottom:14px;">
+            <h2>Set bucket policy</h2>
+          </div>
+          <form id="bucketForm" class="form-grid">
+            <div>
+              <label for="bucketName">Bucket</label>
+              <input type="text" id="bucketName" placeholder="warm" required />
+            </div>
+            <div>
+              <label>Mode</label>
+              <div class="radio-group">
+                <label><input type="radio" name="mode" value="replication" checked /> Replication</label>
+                <label><input type="radio" name="mode" value="erasure" /> Erasure</label>
+              </div>
+            </div>
+            <div id="replFields">
+              <label>N / W / R</label>
+              <div style="display:flex; gap:6px;">
+                <input type="number" id="fN" value="3" min="1" style="width:56px" />
+                <input type="number" id="fW" value="2" min="1" style="width:56px" />
+                <input type="number" id="fR" value="2" min="1" style="width:56px" />
+              </div>
+            </div>
+            <div id="ecFields" style="display:none;">
+              <label>K / M (data / parity)</label>
+              <div style="display:flex; gap:6px;">
+                <input type="number" id="fK" value="4" min="1" style="width:56px" />
+                <input type="number" id="fM" value="2" min="1" style="width:56px" />
+              </div>
+            </div>
+            <div><button class="btn primary" type="submit">Save policy</button></div>
+          </form>
+        </div>
+      </section>
+
+      <section class="section" id="objects">
+        <div class="section-head">
+          <h2>All objects</h2>
+          <span class="hint">across every bucket</span>
+        </div>
+        <table id="objectsTable">
+          <thead><tr><th>Bucket / key</th><th>Size</th><th>Mode</th><th>Placement</th><th>Written</th></tr></thead>
+          <tbody id="objectsBody"></tbody>
+        </table>
+      </section>
+
+      <section class="section" id="repair">
+        <div class="section-head">
+          <h2>Anti-entropy repair</h2>
+          <span class="hint">Merkle-diff replicas, patch divergence</span>
+        </div>
+        <div class="card">
+          <p style="margin:0 0 14px; font-size:13px; color:var(--ink-soft);">
+            Scans every replicated object's replica set, finds copies that are missing or corrupt,
+            and repairs them from a healthy peer.
+          </p>
+          <button class="btn primary" id="repairBtn">Run repair pass</button>
+          <span id="repairResult" class="hint" style="margin-left:12px;"></span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="api.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

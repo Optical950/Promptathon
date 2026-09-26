@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A.R.M.O.R — Objects</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="mark"><span class="mark-glyph"></span><span class="mark-text">A.R.M.O.R</span></div>
+      <div class="mark-sub">object portal</div>
+      <nav>
+        <a href="index.html">&larr; role select</a>
+        <a href="#upload" class="active">Upload</a>
+        <a href="#browse">Browse</a>
+      </nav>
+      <div class="rail-foot">
+        Vault data plane<br />
+        <a href="admin.html">Open admin console &rarr;</a>
+      </div>
+    </aside>
+
+    <main>
+      <h1>Object portal</h1>
+      <p class="subtitle">Upload, download, and manage objects. Writes go through quorum replication or Reed–Solomon erasure coding depending on the bucket's policy.</p>
+
+      <div id="connBanner" class="conn-banner"></div>
+
+      <section class="section" id="upload">
+        <div class="section-head"><h2>Upload</h2></div>
+        <div class="card">
+          <form id="uploadForm" class="form-grid" style="grid-template-columns: 1fr 1fr;">
+            <div>
+              <label for="bucketSelect">Bucket</label>
+              <select id="bucketSelect" required></select>
+            </div>
+            <div>
+              <label for="objKey">Key</label>
+              <input type="text" id="objKey" placeholder="notes/todo.txt" required />
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <label for="objText">Content (text)</label>
+              <textarea id="objText" rows="4" placeholder="Type an object's contents here…"></textarea>
+            </div>
+            <div>
+              <label for="objFile">…or choose a file instead</label>
+              <input type="file" id="objFile" />
+            </div>
+            <div><button class="btn primary" type="submit">Write object</button></div>
+          </form>
+        </div>
+      </section>
+
+      <section class="section" id="browse">
+        <div class="section-head">
+          <h2>Objects</h2>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <select id="filterBucket" style="width:160px;"><option value="">All buckets</option></select>
+            <button class="btn btn-sm" id="refreshBtn">Refresh</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Bucket / key</th><th>Type</th><th>Size</th><th>Durability</th><th>Written</th><th></th></tr></thead>
+          <tbody id="objectsBody"></tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="api.js"></script>
+  <script src="user.js"></script>
+</body>
+</html>
